@@ -1,13 +1,19 @@
 name: Hello world              # label shown in the Actions tab
 
-on: push                       # doorbell: any push to any branch
-
+on:                     # doorbell: any push to any branch
+  pull_request: 
+  push:
+    branches: [main]
+  workflow_dispatch:
+  
 jobs:
   hello:                       # job ID (my choice of name)
     runs-on: ubuntu-latest     # a fresh Linux machine
     steps:
       - name: Greet            # label for this step in the logs
-        run: echo "Hello, pipeline!"          # print a message
+        run: |                            # print a message
+          echo "Hello, pipeline!"   
+          echo "You are progressing."
 
       - name: Show who and why
         run: |                                # "|" lets me write several lines
