@@ -1,0 +1,15 @@
+name: Hello world              # label shown in the Actions tab
+
+on: push                       # doorbell: any push to any branch
+
+jobs:
+  hello:                       # job ID (my choice of name)
+    runs-on: ubuntu-latest     # a fresh Linux machine
+    steps:
+      - name: Greet            # label for this step in the logs
+        run: echo "Hello, pipeline!"          # print a message
+
+      - name: Show who and why
+        run: |                                # "|" lets me write several lines
+          echo "Triggered by: ${{ github.actor }}"
+          echo "On branch:    ${{ github.ref_name }}"
