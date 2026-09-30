@@ -7,7 +7,7 @@ on:                     # doorbell: any push to any branch
   workflow_dispatch:
   
 jobs:
-  hello:                       # job ID (my choice of name)
+   hello:                       # job ID (my choice of name)
     runs-on: ubuntu-latest     # a fresh Linux machine
     steps:
       - name: Greet            # label for this step in the logs
