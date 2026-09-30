@@ -1,7 +1,7 @@
 name: Hello world              # label shown in the Actions tab
 
 on:                     # doorbell: any push to any branch
-  pull_request: 
+   pull_request: 
   push:
     branches: [main]
   workflow_dispatch:
