@@ -1,0 +1,8 @@
+node_modules
+coverage
+reports
+.git
+.github
+.env
+.env.*
+npm-debug.log*
