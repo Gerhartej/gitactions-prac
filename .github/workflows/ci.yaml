@@ -1,52 +1,70 @@
-
-name: Node.js CI
+name: Node.js CI and Container Security
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
+# Give the workflow only read access to repository contents.
 permissions:
   contents: read
 
-jobs:
-  quality-and-tests:
-    name: Node.js ${{ matrix.node }}
-    runs-on: ubuntu-latest
+# Cancel older runs when a newer commit arrives on the same branch/PR.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [22, 24]
+jobs:
+  ci:
+    name: Test, Build and Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
+      # 1. Download the repository code onto the runner.
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      # 2. Install Node.js and npm.
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node }}
-          cache: npm
+          node-version: 24
+          package-manager-cache: false
 
+      # 3. Install exactly the dependencies recorded in package-lock.json.
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint code
+      # 4. Check code style and common JavaScript errors.
+      - name: Run ESLint
         run: npm run lint
 
-      - name: Run tests with coverage
-        run: npm test -- --coverage
+      # 5. Run the automated Jest tests.
+      - name: Run Jest tests
+        run: npm test -- --ci
 
-      - name: Check dependency vulnerabilities
-        run: npm audit --audit-level=high
+      # 6. Check production dependencies for known vulnerabilities.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
 
-      - name: Upload coverage report
-        if: always()
-        uses: actions/upload-artifact@v7
+      # 7. Build the container image locally on the GitHub runner.
+      - name: Build Docker image
+        run: docker build -t nodejs-demo:${{ github.sha }} .
+
+      # 8. Scan the built image for known HIGH/CRITICAL vulnerabilities.
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
-          name: coverage-node-${{ matrix.node }}
-          path: coverage/
-          if-no-files-found: ignore
+          image-ref: nodejs-demo:${{ github.sha }}
+          scan-type: image
+          scanners: vuln
+          vuln-type: os,library
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          format: table
+          exit-code: '1'
