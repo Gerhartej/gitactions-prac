@@ -77,9 +77,9 @@ It installs dependencies, runs linting and automated tests, generates coverage o
 - [x] Build a Node.js REST API
 - [x] Add automated tests
 - [x] Configure ESLint
-- [ ] Consolidate CI workflows
-- [ ] Add Docker support
-- [ ] Scan container images with Trivy
+- [x] Consolidate CI workflows
+- [x] Add Docker support
+- [x] Scan container images with Trivy
 - [ ] Publish images to Amazon ECR
 - [ ] Provision AWS infrastructure with Terraform
 - [ ] Deploy to Amazon ECS Fargate using GitHub Actions and OIDC
